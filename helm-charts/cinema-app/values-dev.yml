@@ -1,0 +1,59 @@
+namespace: dev
+
+app:
+  name: app-service
+
+replicaCount: 1
+
+container:
+  name: cinemaapp
+  image:
+    repository: johanre/cinema-app
+    tag: 0.1.1
+    pullPolicy: Always
+  port: 80
+
+resources:
+  limits:
+    memory: "512Mi"
+    cpu: "1"
+  requests:
+    memory: "256Mi"
+    cpu: "0.5"
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 80
+  protocol: TCP
+
+hpa:
+  name: cinema-app-hpa
+  namespace: dev
+  deploymentName: app-service-deployment
+  minReplicas: 1
+  maxReplicas: 4
+  metrics:
+    cpu:
+      targetUtilization: 20
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 0
+      podsValue: 5
+      periodSeconds: 10
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      podsValue: 2
+      periodSeconds: 10
+    selectPolicy: Max
+
+serviceMonitor:
+  name: app-service-monitor
+  namespace: monitoring
+  release: kube-prometheus
+  selectorLabels:
+    app: app-service
+  targetNamespace: dev
+  port: http
+  path: /metrics
+  interval: 15s

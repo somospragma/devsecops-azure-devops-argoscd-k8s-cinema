@@ -1,5 +1,5 @@
 apiVersion: v2
-name: argocd-apps
+name: shared
 description: A Helm chart for Kubernetes
 
 type: application

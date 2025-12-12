@@ -1,0 +1,31 @@
+trigger:
+  branches:
+    include:
+      - main
+      - develop  
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+
+  - script: |
+      echo "📄 APP - Mostrando contenido del archivo helm-charts/cinema-app/values-dev.yml:"
+      echo "--------------------------------------------------------"
+      cat helm-charts/cinema-app/values-dev.yml || echo "⚠️ El archivo no existe o no tiene contenido aún"
+      echo "--------------------------------------------------------"
+    displayName: "Mostrar contenido del archivo actualizado cinema-app/values-dev.yml"
+
+  - script: |
+      echo "📄 FOOD -Mostrando contenido del archivo helm-charts/cinema-food/values-dev.yml:"
+      echo "--------------------------------------------------------"
+      cat helm-charts/cinema-food/values-dev.yml || echo "⚠️ El archivo no existe o no tiene contenido aún"
+      echo "--------------------------------------------------------"
+    displayName: "Mostrar contenido del archivo actualizado cinema-food/values-dev.yml"
+
+  - script: |
+      echo "📄 SEATS - Mostrando contenido del archivo helm-charts/cinema-app/values-dev.yml:"
+      echo "--------------------------------------------------------"
+      cat helm-charts/cinema-seats/values-dev.yml || echo "⚠️ El archivo no existe o no tiene contenido aún"
+      echo "--------------------------------------------------------"
+    displayName: "Mostrar contenido del archivo actualizado cinema-seats/values-dev.yml"

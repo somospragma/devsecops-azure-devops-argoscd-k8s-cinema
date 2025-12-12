@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ .Values.cronjob.name }}
+  namespace: {{ .Values.cronjob.namespace }}
+spec:
+  schedule: "{{ .Values.cronjob.schedule }}"  # Programación que puedes parametrizar
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: {{ .Values.cronjob.job.containers.name }}
+            image: {{ .Values.cronjob.job.containers.image }}
+            command:
+              {{ .Values.cronjob.job.containers.command | toYaml | nindent 12 }}
+            volumeMounts:
+              - name: {{ .Values.cronjob.job.volumeMounts.name }}
+                mountPath: {{ .Values.cronjob.job.volumeMounts.mountPath }}
+          restartPolicy: OnFailure
+          volumes:
+          - name: food-storage
+            persistentVolumeClaim:
+              claimName: {{ .Values.cronjob.pvc.claimName }}

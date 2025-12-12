@@ -1,0 +1,85 @@
+namespace: dev
+
+app:
+  name: seats-service
+
+replicaCount: 1
+
+initContainer:
+  name: copy-initial-seats
+  image:
+    repository: johanre/cinema-seats
+    tag: 0.0.6
+  filePath: /data/seats.txt
+  initFilePath: /app/init/seats.txt
+  initializedFile: /data/seats.txt.initialized
+
+container:
+  name: seats
+  image:
+    repository: johanre/cinema-seats
+    tag: 0.0.6
+    pullPolicy: Always
+  port: 8081
+  env:
+    PATH_FILE: /data/seats.txt
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "500m"
+      memory: "256Mi"
+
+pv:
+  name: seats-pv
+  capacity: 1Gi
+  accessMode: ReadWriteOnce
+  hostPath: /mnt/data/seats  # Ruta en Minikube o el nodo donde deseas almacenar los archivos
+
+pvc:
+  name: seats-pvc
+  accessMode: ReadWriteOnce
+  storageRequest: 1Gi
+
+hpa:
+  name: cinema-seats-hpa
+  namespace: dev
+  deploymentName: seats-service-deployment
+  minReplicas: 1
+  maxReplicas: 4
+  metrics:
+    cpu:
+      targetUtilization: 20
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 0
+      podsValue: 5
+      periodSeconds: 10
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      podsValue: 2
+      periodSeconds: 10
+    selectPolicy: Max
+
+
+service:
+  type: ClusterIP  # Tipo de servicio, puede ser ClusterIP, LoadBalancer o NodePort
+  port: 80  
+  targetPort: 8081  
+  portName: http  
+
+# Configuración del ServiceMonitor
+serviceMonitor:
+  app:
+    name: seats-service  
+  namespace: dev 
+  monitoringNamespace: monitoring  
+  service:
+    name: seats-service  
+    type: ClusterIP  
+    port: 80  # Puerto dentro del clúster
+    targetPort: 8081  
+  port: http  
+  path: /actuator/prometheus  
+  interval: 15s  

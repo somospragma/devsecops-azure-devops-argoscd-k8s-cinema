@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.app.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.app.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.app.name }}
+    spec:
+      initContainers:
+        - name: {{ .Values.initContainer.name }}
+          image: "{{ .Values.initContainer.image.repository }}:{{ .Values.initContainer.image.tag }}"
+          command:
+            - /bin/sh
+            - -c
+          args:
+            - |
+              echo "Verificando si existe {{ .Values.initContainer.filePath }}..."
+              if [ ! -f {{ .Values.initContainer.filePath }} ]; then
+                echo "Copiando archivo inicial desde {{ .Values.initContainer.initFilePath }}..."
+                cp {{ .Values.initContainer.initFilePath }} {{ .Values.initContainer.filePath }}
+                touch {{ .Values.initContainer.initializedFile }}
+                echo "Archivo inicial copiado y marcador creado."
+              else
+                echo "El archivo ya existe. No se realiza copia."
+              fi
+          volumeMounts:
+            - name: seats-storage
+              mountPath: /data
+
+      containers:
+        - name: {{ .Values.container.name }}
+          image: "{{ .Values.container.image.repository }}:{{ .Values.container.image.tag }}"
+          imagePullPolicy: {{ .Values.container.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.container.port }}
+          env:
+            - name: PATH_FILE
+              value: {{ .Values.container.env.PATH_FILE }}
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+          volumeMounts:
+            - name: seats-storage
+              mountPath: /data
+
+      volumes:
+        - name: seats-storage
+          persistentVolumeClaim:
+            claimName: {{ .Values.pvc.name }}

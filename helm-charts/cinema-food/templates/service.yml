@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.app.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ .Values.app.name }}  # Etiqueta necesaria para coincidir con el selector
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    app: {{ .Values.app.name }}  # Selector que coincide con la etiqueta en los pods
+  ports:
+    - name: {{ .Values.service.portName }}  
+      port: {{ .Values.service.port }}  # Puerto dentro del clúster (por defecto 80)
+      targetPort: {{ .Values.service.targetPort }}  

@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ .Release.Name }}-monitor
+  namespace: {{ .Values.serviceMonitor.monitoringNamespace }}
+  labels:
+    release: kube-prometheus
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.serviceMonitor.app.name }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Values.serviceMonitor.namespace }}
+  endpoints:
+    - port: {{ .Values.serviceMonitor.port }}  
+      path: {{ .Values.serviceMonitor.path }}  # Ruta de métricas
+      interval: {{ .Values.serviceMonitor.interval }}  # Intervalo

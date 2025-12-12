@@ -1,0 +1,34 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cinema
+  namespace: dev
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: {{ .Values.services.app.name }}
+                port:
+                  number: {{ .Values.services.app.port }}
+          - path: /(api/food.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: {{ .Values.services.food.name }}
+                port:
+                  number: {{ .Values.services.food.port }}
+          - path: /(api/seats.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: {{ .Values.services.seats.name }}
+                port:
+                  number: {{ .Values.services.seats.port }}
+          

@@ -1,0 +1,27 @@
+namespace: dev
+
+services:
+  app:
+    name: app-service
+    port: 80
+  food:
+    name: food-service
+    port: 80
+  seats:
+    name: seats-service
+    port: 80
+  grafana:
+    name: kube-prometheus-grafana
+    port: 80
+
+
+serviceMonitor:
+  name: food-service-monitor
+  namespace: monitoring
+  release: kube-prometheus
+  selectorLabels:
+    app: food-service
+  targetNamespace: dev
+  port: http
+  path: /metrics
+  interval: 15s
