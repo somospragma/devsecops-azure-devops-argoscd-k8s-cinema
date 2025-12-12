@@ -1,0 +1,14 @@
+abrir grafana
+minikube service kube-prometheus-grafana -n monitoring
+
+usuario    : admin
+contraseña: prom-operator
+***********************************************************************
+
+abrir prometheus
+minikube service kube-prometheus-kube-prome-prometheus -n monitoring
+
+
+kubectl get servicemonitors --all-namespaces
+kubectl get servicemonitor nginx-exporter -n monitoring -o yaml
+kubectl get svc nginx-exporter -n demo --show-labels

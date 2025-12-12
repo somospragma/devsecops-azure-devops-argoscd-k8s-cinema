@@ -1,0 +1,37 @@
+###################################################
+# Minikube
+###################################################
+argo:
+  appName: prod-cinema-app  
+  repoURL: git@gitlab.com:be-bulder/gitops/minikube/manifest-k8s.git
+  targetRevision: HEAD
+  path: helm-charts/cinema-app 
+  helm:
+    valueFiles:
+      - values-prod.yml  
+  destinationServer: https://kubernetes.default.svc
+  destinationNamespace: prod
+  syncPolicy:
+    selfHeal: true
+    prune: true
+    syncOptions:
+      createNamespace: true
+
+
+###################################################
+# EKS
+###################################################
+
+# argo:
+#   environment: prod
+#   repoURL: git@gitlab.com:be-bulder/minikube/manifest-eks.git
+#   targetRevision: develop
+#   destinationServer: https://E3C2D4F5E6D7F8G9H0I1J2K3L4M5N6O7-1234567890.us-west-2.eks.amazonaws.com # actualizar por cluuster de prod
+#   destinationNamespace: prod
+#   valueFiles:
+#     - values-prod.yml
+#   syncPolicy:
+#     selfHeal: true
+#     prune: true
+#     syncOptions:
+#       CreateNamespace: true
